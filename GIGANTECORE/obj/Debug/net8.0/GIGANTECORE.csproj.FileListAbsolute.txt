@@ -182,3 +182,4 @@
 /Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/obj/Debug/net8.0/GIGANTECORE.pdb
 /Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/obj/Debug/net8.0/GIGANTECORE.genruntimeconfig.cache
 /Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/obj/Debug/net8.0/ref/GIGANTECORE.dll
+/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/obj/Debug/net8.0/GIGANTECORE.sourcelink.json

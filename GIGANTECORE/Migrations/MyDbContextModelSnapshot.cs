@@ -236,6 +236,39 @@ namespace GIGANTECORE.Migrations
                     b.ToTable("Productos");
                 });
 
+            modelBuilder.Entity("GIGANTECORE.Models.RolePermiso", b =>
+                {
+                    b.Property<int>("IdRol")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdRol"));
+
+                    b.Property<bool>("CanCreate")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CanDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CanRead")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CanUpdate")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("IdRol");
+
+                    b.ToTable("RolePermisos");
+                });
+
             modelBuilder.Entity("GIGANTECORE.Models.Solicitud", b =>
                 {
                     b.Property<int>("IdSolicitud")

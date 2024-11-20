@@ -77,8 +77,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 
-//Usamos la autenticación antes de la autorización
-app.UseAuthentication();
+
 
 
 if (app.Environment.IsDevelopment())
@@ -90,7 +89,9 @@ if (app.Environment.IsDevelopment())
 app.UseRouting();
 app.UseCors();
 app.UseHttpsRedirection();
-
+//Usamos la autenticación antes de la autorización
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {

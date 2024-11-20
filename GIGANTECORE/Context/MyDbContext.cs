@@ -36,7 +36,7 @@ public partial class MyDbContext : DbContext
 
     public virtual DbSet<UsuarioCliente> UsuarioClientes { get; set; }
 
-    
+    public virtual DbSet<RolePermiso> RolePermisos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
