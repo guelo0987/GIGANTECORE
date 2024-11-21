@@ -9,7 +9,7 @@ namespace GIGANTECORE.Controllers;
 
 
 [ApiController]
-[Route("api/Permisos")]
+[Route("api/[controller]")]
 [Authorize(Policy = "RequireAdministratorRole")]
 public class PermissionController:ControllerBase
 {
