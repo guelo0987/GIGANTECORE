@@ -1,5 +1,6 @@
 using System.Text;
 using GIGANTECORE.Context;
+
 using Serilog;
 using Newtonsoft.Json;
 using Microsoft.IdentityModel.Tokens;
@@ -29,6 +30,8 @@ builder.Services.AddDbContext<MyDbContext>(options =>
 builder.Services.AddControllers(option => option.ReturnHttpNotAcceptable = true)
     .AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore)
     .AddXmlDataContractSerializerFormatters();
+
+
 
 
 //Configuracion JWT
@@ -89,8 +92,9 @@ if (app.Environment.IsDevelopment())
 app.UseRouting();
 app.UseCors();
 app.UseHttpsRedirection();
-//Usamos la autenticación antes de la autorización
+//Usamos la autenticación antes de la autorización  
 app.UseAuthentication();
+app.UseMiddleware<RolePermissionMiddleware>();
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>

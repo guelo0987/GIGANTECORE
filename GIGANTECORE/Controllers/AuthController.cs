@@ -12,7 +12,6 @@ namespace GIGANTECORE.Controllers;
 
 
 
-
 [Route("api/[controller]")]
 [ApiController]
 public class AuthController:ControllerBase
@@ -29,44 +28,6 @@ public class AuthController:ControllerBase
         _configuration = configuration;
         _db = db;
     }
-    
-    [HttpPost("register")]
-    public IActionResult Register([FromBody] AdminDTO adminDto)
-    {
-        // Verificar si el correo ya existe
-        if (_db.Admins.Any(a => a.Mail == adminDto.Mail))
-        {
-            _logger.LogError("El correo ya esta registrado");
-            return BadRequest("El correo ya está registrado.");
-        }
-
-        // Validar que el rol sea "Admin" o "Empleado"
-        if (adminDto.Rol != "Admin" && adminDto.Rol != "Empleado")
-        {
-            _logger.LogError("El rol debe ser Admin o Empleado");
-            return BadRequest("El rol debe ser 'Admin' o 'Empleado'.");
-        }
-
-        // Crear el usuario
-        var newAdmin = new Admin
-        {
-            Nombre = adminDto.Nombre,
-            Mail = adminDto.Mail,
-            Password = PassHasher.HashPassword(adminDto.Password), // Almacenar contraseña hasheada
-            Rol = adminDto.Rol,
-            FechaIngreso = DateTime.Now
-        };
-
-        // Guardar en la base de datos
-        _db.Admins.Add(newAdmin);
-        _db.SaveChanges();
-        _logger.LogInformation("El Usuario ha sido creado exitosamente");
-
-        return Ok(new { Message = "Usuario registrado exitosamente.", UserId = newAdmin.Id });
-    }
-
-
-    
     
     
     
