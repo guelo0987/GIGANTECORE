@@ -40,40 +40,85 @@ public class CategoriaController:ControllerBase
 
     
     [HttpPost]
-    public IActionResult AddCategoria([FromBody] CategoriumDTO categoria)
+public IActionResult AddOrUpdateCategoria([FromBody] CategoriumDTO categoria)
+{
+    // Validar que el objeto no sea nulo
+    if (categoria == null)
     {
-        // Validar que el objeto no sea nulo
-        if (categoria == null)
+        return BadRequest(new { Message = "El cuerpo de la solicitud no puede estar vacío." });
+    }
+
+    // Validar que el nombre no esté vacío
+    if (string.IsNullOrWhiteSpace(categoria.Nombre))
+    {
+        return BadRequest(new { Message = "El nombre de la categoría es obligatorio." });
+    }
+
+    if (categoria.Id > 0) // Actualizar categoría existente
+    {
+        // Buscar la categoría por ID
+        var existingCategoria = _db.Categoria.FirstOrDefault(c => c.Id == categoria.Id);
+
+        if (existingCategoria == null)
         {
-            return BadRequest(new { Message = "El cuerpo de la solicitud no puede estar vacío." });
+            return NotFound(new { Message = "La categoría no fue encontrada para su actualización." });
         }
 
-        // Validar que el nombre no esté vacío
-        if (string.IsNullOrWhiteSpace(categoria.Nombre))
+        // Verificar si el nuevo nombre ya existe en otra categoría (case insensitive)
+        if (_db.Categoria.Any(c => c.Id != categoria.Id && c.Nombre.ToLower() == categoria.Nombre.ToLower()))
         {
-            return BadRequest(new { Message = "El nombre de la categoría es obligatorio." });
+            return Conflict(new { Message = $"Ya existe otra categoría con el nombre '{categoria.Nombre}'." });
         }
 
-        // Validar que no exista otra categoría con el mismo nombre (case insensitive)
+        // Actualizar los datos de la categoría
+        existingCategoria.Nombre = categoria.Nombre;
+
+        _db.SaveChanges();
+        return Ok(new { Message = "Categoría actualizada exitosamente.", Categoria = existingCategoria });
+    }
+    else // Crear nueva categoría
+    {
+        // Verificar si ya existe una categoría con el mismo nombre
         if (_db.Categoria.Any(c => c.Nombre.ToLower() == categoria.Nombre.ToLower()))
         {
             return Conflict(new { Message = $"Ya existe una categoría con el nombre '{categoria.Nombre}'." });
         }
 
-        // Agregar la nueva categoría a la base de datos
-
-        var Newcat = new Categorium
+        // Crear nueva categoría
+        var newCategoria = new Categorium
         {
-            Nombre = categoria.Nombre,
-
+            Nombre = categoria.Nombre
         };
-        
-        
-        _db.Categoria.Add(Newcat);
+
+        _db.Categoria.Add(newCategoria);
         _db.SaveChanges();
 
-        return Ok(new { Message = "Categoría agregada exitosamente.", Categoria = categoria });
+        return Ok(new { Message = "Categoría creada exitosamente.", Categoria = newCategoria });
     }
+}
+
+
+    [HttpDelete("{id}")]
+    public IActionResult DeleteCategoria(int id)
+    {
+        // Buscar la categoría existente
+        var categoria = _db.Categoria.FirstOrDefault(c => c.Id == id);
+        if (categoria == null)
+        {
+            return NotFound(new { Message = "La categoría no fue encontrada." });
+        }
+
+        // Eliminar la categoría
+        _db.Categoria.Remove(categoria);
+        _db.SaveChanges();
+
+        return Ok(new { Message = "Categoría eliminada exitosamente." });
+    }
+
+
+    
+    
+    
 
 
     
