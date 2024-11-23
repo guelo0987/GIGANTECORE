@@ -27,6 +27,22 @@ public class SubCategoriaController : ControllerBase
         // Retorna todas las subcategorías
         return Ok(_db.SubCategoria.ToList());
     }
+    
+    
+    [HttpGet("{id}")]
+    public IActionResult GetSubCategoriaId(int id)
+    {
+        var subCategorium = _db.SubCategoria
+            .FirstOrDefault(u => u.Id == id);
+
+        if (subCategorium == null)
+        {
+            _logger.LogError($"Subcategoria con ID {id} no encontrada.");
+            return NotFound("Subcategoria no encontrada.");
+        }
+
+        return Ok(subCategorium);
+    }
 
     [HttpPost]
     public IActionResult AddOrUpdateSubCategoria([FromBody] SubCategoriumDTO subCategoria)

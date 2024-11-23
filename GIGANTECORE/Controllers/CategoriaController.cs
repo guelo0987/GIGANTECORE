@@ -37,6 +37,21 @@ public class CategoriaController:ControllerBase
         // No necesitas verificar permisos aquí, ya que el middleware lo maneja
         return Ok(_db.Categoria.ToList());
     }
+    
+    [HttpGet("{id}")]
+    public IActionResult GetCategoriaId(int id)
+    {
+        var categorium = _db.Categoria
+            .FirstOrDefault(u => u.Id == id);
+
+        if (categorium == null)
+        {
+            _logger.LogError($"categoria con ID {id} no encontrada.");
+            return NotFound("categoria no encontrada.");
+        }
+
+        return Ok(categorium);
+    }
 
     
     [HttpPost]

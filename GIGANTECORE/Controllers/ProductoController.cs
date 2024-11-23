@@ -27,6 +27,23 @@ public class ProductoController : ControllerBase
         // Retorna todos los productos
         return Ok(_db.Productos.ToList());
     }
+    
+    
+    
+    [HttpGet("{codigo}")]
+    public IActionResult GetProductoId(int codigo)
+    {
+        var producto = _db.Productos
+            .FirstOrDefault(u => u.Codigo == codigo);
+
+        if (producto == null)
+        {
+            _logger.LogError($"Producto con ID {codigo} no encontrada.");
+            return NotFound("Producto no encontrada.");
+        }
+
+        return Ok(producto);
+    }
 
     [HttpPost]
     public IActionResult AddOrUpdateProducto([FromBody] ProductoDTO producto)
@@ -53,6 +70,12 @@ public class ProductoController : ControllerBase
 
         // Buscar si el producto ya existe basado en el código
         var existingProducto = _db.Productos.FirstOrDefault(p => p.Codigo == producto.Codigo);
+
+
+        if (producto.Codigo == 0)
+        {
+            return Conflict(new { Message = $"El codigo No puede ser 0" });
+        }
 
         if (existingProducto != null) // Actualizar producto existente
         {
