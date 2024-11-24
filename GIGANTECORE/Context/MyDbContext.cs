@@ -124,27 +124,31 @@ public partial class MyDbContext : DbContext
 
             entity.ToTable("HistorialCorreo");
 
-            entity.HasIndex(e => e.SolicitudId, "IX_HistorialCorreo_SolicitudId");
+            entity.HasIndex(e => e.DetalleSolicitudId, "IX_HistorialCorreo_DetalleSolicitudId");
 
             entity.HasIndex(e => e.UsuarioId, "IX_HistorialCorreo_UsuarioId");
 
             entity.Property(e => e.Estado)
                 .HasMaxLength(20)
                 .HasDefaultValue("Enviado");
+
             entity.Property(e => e.FechaEnvio)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
 
-            entity.HasOne(d => d.Solicitud).WithMany(p => p.HistorialCorreos)
-                .HasForeignKey(d => d.SolicitudId)
+            entity.HasOne(d => d.DetalleSolicitud)
+                .WithMany(p => p.HistorialCorreos)
+                .HasForeignKey(d => d.DetalleSolicitudId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Historial__Solic__66603565");
+                .HasConstraintName("FK__HistorialCorreo__DetalleSolicitudId");
 
-            entity.HasOne(d => d.Usuario).WithMany(p => p.HistorialCorreos)
+            entity.HasOne(d => d.Usuario)
+                .WithMany(p => p.HistorialCorreos)
                 .HasForeignKey(d => d.UsuarioId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Historial__Usuar__656C112C");
+                .HasConstraintName("FK__HistorialCorreo__UsuarioId");
         });
+
 
         modelBuilder.Entity<Producto>(entity =>
         {

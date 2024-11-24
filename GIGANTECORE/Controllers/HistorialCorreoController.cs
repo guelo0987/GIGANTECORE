@@ -11,39 +11,39 @@ namespace GIGANTECORE.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class DetalleSolicitudController : ControllerBase
+public class HistorialCorreoController : ControllerBase
 {
     private readonly MyDbContext _db;
-    private readonly ILogger<DetalleSolicitudController> _logger;
+    private readonly ILogger<HistorialCorreoController> _logger;
 
-    public DetalleSolicitudController(ILogger<DetalleSolicitudController> logger, MyDbContext db)
+    public HistorialCorreoController(ILogger<HistorialCorreoController> logger, MyDbContext db)
     {
         _logger = logger;
         _db = db;
     }
 
     [HttpGet]
-    public IActionResult GetDetalleSolicitudes()
+    public IActionResult GetHistorialCorreoController()
     {
         // Retorna todos los productos
-        return Ok(_db.DetalleSolicituds.ToList());
+        return Ok(_db.HistorialCorreos.ToList());
     }
 
  
 
     [HttpGet("{Id}")]
-    public IActionResult GetDetalleSolicitudesId(int Id)
+    public IActionResult GetHistorialCorreoControllerId(int Id)
     {
-        var Detallesolicitud = _db.DetalleSolicituds
-            .FirstOrDefault(u => u.IdSolicitud == Id);
+        var HistorialCorreoController = _db.HistorialCorreos.
+            FirstOrDefault(u => u.Id == Id);
 
-        if (Detallesolicitud == null)
+        if (HistorialCorreoController == null)
         {
             _logger.LogError($"Producto con ID {Id} no encontrada.");
             return NotFound("Producto no encontrada.");
         }
 
-        return Ok(Detallesolicitud);
+        return Ok(HistorialCorreoController);
     }
 
 }

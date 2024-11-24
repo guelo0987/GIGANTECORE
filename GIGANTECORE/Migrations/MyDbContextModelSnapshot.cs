@@ -170,6 +170,9 @@ namespace GIGANTECORE.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("DetalleSolicitudId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Estado")
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
@@ -181,16 +184,13 @@ namespace GIGANTECORE.Migrations
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())");
 
-                    b.Property<int>("SolicitudId")
-                        .HasColumnType("int");
-
                     b.Property<int>("UsuarioId")
                         .HasColumnType("int");
 
                     b.HasKey("Id")
                         .HasName("PK__Historia__3214EC0765966D64");
 
-                    b.HasIndex(new[] { "SolicitudId" }, "IX_HistorialCorreo_SolicitudId");
+                    b.HasIndex(new[] { "DetalleSolicitudId" }, "IX_HistorialCorreo_DetalleSolicitudId");
 
                     b.HasIndex(new[] { "UsuarioId" }, "IX_HistorialCorreo_UsuarioId");
 
@@ -419,19 +419,19 @@ namespace GIGANTECORE.Migrations
 
             modelBuilder.Entity("GIGANTECORE.Models.HistorialCorreo", b =>
                 {
-                    b.HasOne("GIGANTECORE.Models.Solicitud", "Solicitud")
+                    b.HasOne("GIGANTECORE.Models.DetalleSolicitud", "DetalleSolicitud")
                         .WithMany("HistorialCorreos")
-                        .HasForeignKey("SolicitudId")
+                        .HasForeignKey("DetalleSolicitudId")
                         .IsRequired()
-                        .HasConstraintName("FK__Historial__Solic__66603565");
+                        .HasConstraintName("FK__HistorialCorreo__DetalleSolicitudId");
 
                     b.HasOne("GIGANTECORE.Models.UsuarioCliente", "Usuario")
                         .WithMany("HistorialCorreos")
                         .HasForeignKey("UsuarioId")
                         .IsRequired()
-                        .HasConstraintName("FK__Historial__Usuar__656C112C");
+                        .HasConstraintName("FK__HistorialCorreo__UsuarioId");
 
-                    b.Navigation("Solicitud");
+                    b.Navigation("DetalleSolicitud");
 
                     b.Navigation("Usuario");
                 });
@@ -498,6 +498,11 @@ namespace GIGANTECORE.Migrations
                     b.Navigation("UsuarioClientes");
                 });
 
+            modelBuilder.Entity("GIGANTECORE.Models.DetalleSolicitud", b =>
+                {
+                    b.Navigation("HistorialCorreos");
+                });
+
             modelBuilder.Entity("GIGANTECORE.Models.Producto", b =>
                 {
                     b.Navigation("Carritos");
@@ -508,8 +513,6 @@ namespace GIGANTECORE.Migrations
             modelBuilder.Entity("GIGANTECORE.Models.Solicitud", b =>
                 {
                     b.Navigation("DetalleSolicituds");
-
-                    b.Navigation("HistorialCorreos");
                 });
 
             modelBuilder.Entity("GIGANTECORE.Models.SubCategorium", b =>
