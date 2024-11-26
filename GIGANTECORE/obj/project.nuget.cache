@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "A0vPEciWMlAnZUatwWMD1g1McrBtm4373vTLu+UWnPqGJ4YlrTxS66e2a16wWB7PDvt/jcHKSVU5ZBq+tTMk8w==",
+  "dgSpecHash": "B03QILYoLquEM0xl48RTYIhnzG0GwqRCan+V/xhATOtwIj5qyRKIciB/ruKrJEPCaMroaGBopEf03f9kqq//yg==",
   "success": true,
   "projectFilePath": "/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/GIGANTECORE.csproj",
   "expectedPackageFiles": [
@@ -60,6 +60,7 @@
     "/Users/miguelcruz/.nuget/packages/mono.texttemplating/3.0.0/mono.texttemplating.3.0.0.nupkg.sha512",
     "/Users/miguelcruz/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512",
     "/Users/miguelcruz/.nuget/packages/newtonsoft.json.bson/1.0.2/newtonsoft.json.bson.1.0.2.nupkg.sha512",
+    "/Users/miguelcruz/.nuget/packages/scrutor/3.3.0/scrutor.3.3.0.nupkg.sha512",
     "/Users/miguelcruz/.nuget/packages/serilog/4.0.0/serilog.4.0.0.nupkg.sha512",
     "/Users/miguelcruz/.nuget/packages/serilog.aspnetcore/8.0.3/serilog.aspnetcore.8.0.3.nupkg.sha512",
     "/Users/miguelcruz/.nuget/packages/serilog.extensions.hosting/8.0.0/serilog.extensions.hosting.8.0.0.nupkg.sha512",
@@ -70,6 +71,8 @@
     "/Users/miguelcruz/.nuget/packages/serilog.sinks.debug/2.0.0/serilog.sinks.debug.2.0.0.nupkg.sha512",
     "/Users/miguelcruz/.nuget/packages/serilog.sinks.file/6.0.0/serilog.sinks.file.6.0.0.nupkg.sha512",
     "/Users/miguelcruz/.nuget/packages/swashbuckle.aspnetcore/7.0.0/swashbuckle.aspnetcore.7.0.0.nupkg.sha512",
+    "/Users/miguelcruz/.nuget/packages/swashbuckle.aspnetcore.filters/8.0.2/swashbuckle.aspnetcore.filters.8.0.2.nupkg.sha512",
+    "/Users/miguelcruz/.nuget/packages/swashbuckle.aspnetcore.filters.abstractions/8.0.2/swashbuckle.aspnetcore.filters.abstractions.8.0.2.nupkg.sha512",
     "/Users/miguelcruz/.nuget/packages/swashbuckle.aspnetcore.swagger/7.0.0/swashbuckle.aspnetcore.swagger.7.0.0.nupkg.sha512",
     "/Users/miguelcruz/.nuget/packages/swashbuckle.aspnetcore.swaggergen/7.0.0/swashbuckle.aspnetcore.swaggergen.7.0.0.nupkg.sha512",
     "/Users/miguelcruz/.nuget/packages/swashbuckle.aspnetcore.swaggerui/7.0.0/swashbuckle.aspnetcore.swaggerui.7.0.0.nupkg.sha512",

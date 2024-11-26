@@ -183,3 +183,7 @@
 /Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/obj/Debug/net8.0/GIGANTECORE.genruntimeconfig.cache
 /Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/obj/Debug/net8.0/ref/GIGANTECORE.dll
 /Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/obj/Debug/net8.0/GIGANTECORE.sourcelink.json
+/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Scrutor.dll
+/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Swashbuckle.AspNetCore.Filters.dll
+/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Swashbuckle.AspNetCore.Filters.Abstractions.dll
+/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Imagenes/Banners/.DS_Store

@@ -27,10 +27,54 @@ public class UserController : ControllerBase
         _db = db;
     }
 
-    // Crear un nuevo usuario
-    [HttpPost("register")]
-    public IActionResult Register([FromBody] AdminDTO adminDto)
+    // Crear o Editar un  usuario
+    
+  [HttpPost]  
+public IActionResult AddOrUpdate([FromBody] AdminDTO adminDto)
+{
+    if (adminDto == null)
     {
+        _logger.LogError("El cuerpo de la solicitud está vacío.");
+        return BadRequest("El cuerpo de la solicitud no puede estar vacío.");
+    }
+
+    if (string.IsNullOrEmpty(adminDto.Mail))
+    {
+        _logger.LogError("El correo es obligatorio.");
+        return BadRequest("El correo es obligatorio.");
+    }
+
+    // Verificamos si es una actualización (ID presente y válido)
+    if (adminDto.Id > 0)
+    {
+        var existingUser = _db.Admins.FirstOrDefault(u => u.Id == adminDto.Id);
+
+        if (existingUser == null)
+        {
+            _logger.LogError($"Usuario con ID {adminDto.Id} no encontrado.");
+            return NotFound("Usuario no encontrado.");
+        }
+
+        // Actualizamos los valores
+        existingUser.Nombre = adminDto.Nombre;
+        existingUser.Mail = adminDto.Mail;
+        existingUser.Rol = adminDto.Rol;
+        existingUser.Telefono = adminDto.Telefono;
+        existingUser.SoloLectura = adminDto.SoloLectura;
+
+        // Solo actualizamos la contraseña si se envía una nueva
+        if (!string.IsNullOrEmpty(adminDto.Password))
+        {
+            existingUser.Password = PassHasher.HashPassword(adminDto.Password);
+        }
+
+        _db.SaveChanges();
+        _logger.LogInformation($"Usuario con ID {adminDto.Id} actualizado exitosamente.");
+        return Ok(new { Message = "Usuario actualizado exitosamente.", UserId = existingUser.Id });
+    }
+    else
+    {
+        // Validaciones para un nuevo registro
         if (_db.Admins.Any(a => a.Mail == adminDto.Mail))
         {
             _logger.LogError("El correo ya está registrado.");
@@ -60,6 +104,8 @@ public class UserController : ControllerBase
 
         return Ok(new { Message = "Usuario registrado exitosamente.", UserId = newAdmin.Id });
     }
+}
+
 
     // Obtener todos los usuarios
     [HttpGet]
@@ -86,36 +132,8 @@ public class UserController : ControllerBase
         return Ok(user);
     }
 
-    // Actualizar un usuario
-    [HttpPut("{id}")]
-    public IActionResult UpdateUser(int id, [FromBody] AdminDTO adminDto)
-    {
-        var user = _db.Admins.FirstOrDefault(u => u.Id == id);
-
-        if (user == null)
-        {
-            _logger.LogError($"Usuario con ID {id} no encontrado.");
-            return NotFound("Usuario no encontrado.");
-        }
-
-        // Actualizamos los valores
-        user.Nombre = adminDto.Nombre;
-        user.Mail = adminDto.Mail;
-        user.Rol = adminDto.Rol;
-        user.Telefono = adminDto.Telefono;
-        user.SoloLectura = adminDto.SoloLectura;
-
-        // Solo actualizamos la contraseña si se envía una nueva
-        if (!string.IsNullOrEmpty(adminDto.Password))
-        {
-            user.Password = PassHasher.HashPassword(adminDto.Password);
-        }
-
-        _db.SaveChanges();
-        _logger.LogInformation($"Usuario con ID {id} actualizado exitosamente.");
-
-        return Ok("Usuario actualizado exitosamente.");
-    }
+    
+   
 
     // Eliminar un usuario
     [HttpDelete("{id}")]

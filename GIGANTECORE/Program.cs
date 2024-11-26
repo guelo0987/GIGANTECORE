@@ -1,12 +1,13 @@
 using System.Text;
 using GIGANTECORE.Context;
-
 using Serilog;
 using Newtonsoft.Json;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-
+using Microsoft.Extensions.FileProviders;
+using Swashbuckle.AspNetCore.Filters;
+using System.IO;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -73,15 +74,26 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
+builder.Services.AddSingleton<IWebHostEnvironment>(builder.Environment);
+
 //Configuración Cors para poder hacerlo con ReactJS
 builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy => policy.AllowAnyHeader().AllowAnyHeader().AllowAnyOrigin()));
 
 var app = builder.Build();
 
+var imagesPath = Path.Combine(Directory.GetCurrentDirectory(), "Imagenes");
+if (!Directory.Exists(imagesPath))
+{
+    Directory.CreateDirectory(imagesPath);
+}
 
 
-
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(imagesPath),
+    RequestPath = "/Imagenes"
+});
 
 if (app.Environment.IsDevelopment())
 {
