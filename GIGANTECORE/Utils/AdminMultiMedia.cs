@@ -97,7 +97,6 @@ public class AdminMultiMedia
     public List<Banner> GetImages()
     {
         return _context.Banners
-            .Where(b => b.Active)
             .OrderBy(b => b.OrderIndex)
             .ToList();
     }

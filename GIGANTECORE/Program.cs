@@ -78,7 +78,14 @@ builder.Services.AddSingleton<IWebHostEnvironment>(builder.Environment);
 
 //Configuración Cors para poder hacerlo con ReactJS
 builder.Services.AddCors(options =>
-    options.AddDefaultPolicy(policy => policy.AllowAnyHeader().AllowAnyHeader().AllowAnyOrigin()));
+{
+    options.AddPolicy("AllowReactApp",
+        builder => builder
+            .WithOrigins("http://localhost:5173") // URL de tu app React
+            .AllowAnyMethod()     // Permite todos los métodos HTTP (GET, POST, PUT, DELETE, etc.)
+            .AllowAnyHeader()
+            .AllowCredentials());
+});
 
 var app = builder.Build();
 
@@ -104,7 +111,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
-app.UseCors();
+app.UseCors("AllowReactApp");
 app.UseHttpsRedirection();
 //Usamos la autenticación antes de la autorización  
 app.UseAuthentication();
