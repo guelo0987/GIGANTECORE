@@ -22,6 +22,9 @@ public class RolePermissionMiddleware
             await _next(context);
             return;
         }
+        
+        
+        
 
         // Resolver el DbContext
         var db = context.RequestServices.GetRequiredService<MyDbContext>();

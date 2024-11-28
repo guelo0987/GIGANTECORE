@@ -187,3 +187,4 @@
 /Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Swashbuckle.AspNetCore.Filters.dll
 /Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Swashbuckle.AspNetCore.Filters.Abstractions.dll
 /Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Imagenes/Banners/.DS_Store
+/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Imagenes/Banners/fefc0342-c1d0-4ce5-b58e-b789346180c1.jpeg

@@ -1,17 +1,20 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using GIGANTECORE.Models;
+using GIGANTECORE.Context;
+
+namespace GIGANTECORE.Services;
 
 public class AdminMultiMedia
 {
-    private readonly DbContext _context;
+    private readonly MyDbContext _context;
 
-    public AdminMultiMedia(DbContext context)
+    public AdminMultiMedia(MyDbContext context)
     {
         _context = context;
     }
 
-    public async Task<string> Upload(IFormFile file)
+    public string Upload(IFormFile file)
     {
         List<string> validar = new List<string>{".jpg", ".png", ".jpeg"};
         string extension = Path.GetExtension(file.FileName);
@@ -22,106 +25,95 @@ public class AdminMultiMedia
         }
 
         long size = file.Length;
-        if (size > (5 * 1024 * 1024)) // Corregido a 5MB
+        if (size > (5 * 1024 * 1024))
         {
             return "El archivo no puede sobrepasar los 5mb";
         }
 
         string fileName = Guid.NewGuid().ToString() + extension;
         string path = Path.Combine(Directory.GetCurrentDirectory(), "Imagenes", "Banners");
-        
-        if (!Directory.Exists(path))
-        {
-            Directory.CreateDirectory(path);
-        }
+        FileStream stream = new FileStream(Path.Combine(path, fileName), FileMode.Create);
+        file.CopyTo(stream);
 
-        using (FileStream stream = new FileStream(Path.Combine(path, fileName), FileMode.Create))
-        {
-            await file.CopyToAsync(stream);
-        }
-
-        // Crear nuevo banner en la base de datos
         var banner = new Banner
         {
             ImageUrl = fileName,
             Active = true,
-            OrderIndex = await _context.Set<Banner>().MaxAsync(b => (int?)b.OrderIndex) + 1 ?? 1
+            OrderIndex = _context.Banners.Max(b => (int?)b.OrderIndex) + 1 ?? 1
         };
 
-        _context.Set<Banner>().Add(banner);
-        await _context.SaveChangesAsync();
+        _context.Banners.Add(banner);
+        _context.SaveChanges();
 
         return fileName;
     }
 
-    public async Task<bool> Delete(int id)
+    public bool Delete(int id)
     {
         try
         {
-            var banner = await _context.Set<Banner>().FindAsync(id);
+            var banner = _context.Banners.Find(id);
             if (banner == null) return false;
 
-            // Eliminar archivo físico
             string path = Path.Combine(Directory.GetCurrentDirectory(), "Imagenes", "Banners", banner.ImageUrl);
             if (File.Exists(path))
             {
                 File.Delete(path);
             }
 
-            // Eliminar de la base de datos
-            _context.Set<Banner>().Remove(banner);
-            await _context.SaveChangesAsync();
+            _context.Banners.Remove(banner);
+            _context.SaveChanges();
 
             return true;
         }
-        catch (Exception)
+        catch
         {
             return false;
         }
     }
 
-    public async Task<bool> ReorderImages(List<(int id, int newOrder)> newOrders)
+    public bool ReorderImages(List<(int id, int newOrder)> newOrders)
     {
         try
         {
             foreach (var (id, newOrder) in newOrders)
             {
-                var banner = await _context.Set<Banner>().FindAsync(id);
+                var banner = _context.Banners.Find(id);
                 if (banner != null)
                 {
                     banner.OrderIndex = newOrder;
                 }
             }
             
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
             return true;
         }
-        catch (Exception)
+        catch
         {
             return false;
         }
     }
 
-    public async Task<List<Banner>> GetImages()
+    public List<Banner> GetImages()
     {
-        return await _context.Set<Banner>()
+        return _context.Banners
             .Where(b => b.Active)
             .OrderBy(b => b.OrderIndex)
-            .ToListAsync();
+            .ToList();
     }
 
-    public async Task<bool> ToggleActive(int id)
+    public bool ToggleActive(int id)
     {
         try
         {
-            var banner = await _context.Set<Banner>().FindAsync(id);
+            var banner = _context.Banners.Find(id);
             if (banner == null) return false;
 
             banner.Active = !banner.Active;
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
             return true;
         }
-        catch (Exception)
+        catch
         {
             return false;
         }

@@ -89,11 +89,7 @@ if (!Directory.Exists(imagesPath))
 }
 
 
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(imagesPath),
-    RequestPath = "/Imagenes"
-});
+
 
 if (app.Environment.IsDevelopment())
 {
