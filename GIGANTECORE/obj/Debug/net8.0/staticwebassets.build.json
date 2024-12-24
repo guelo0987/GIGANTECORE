@@ -1,11 +1,12 @@
 {
   "Version": 1,
-  "Hash": "n8bw7vfBfPSIePnJkrKUv8r7J0cVrFcz2ojQFtAyoH0=",
+  "Hash": "F1dTQEKOdBLkc/7zVse+jiEWrNfFwPyoXd48IBtRKMQ=",
   "Source": "GIGANTECORE",
   "BasePath": "_content/GIGANTECORE",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
-  "Assets": []
+  "Assets": [],
+  "Endpoints": []
 }
