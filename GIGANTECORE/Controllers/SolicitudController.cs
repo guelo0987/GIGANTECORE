@@ -26,7 +26,10 @@ public class SolicitudController : ControllerBase
     public IActionResult GetSolicitudes()
     {
         // Retorna todos los productos
-        return Ok(_db.Solicituds.ToList());
+        return Ok(_db.Solicituds
+            .Include(o=>o.DetalleSolicituds)
+            .Include(o=>o.Usuario)
+            .ToList());
     }
 
 
@@ -34,7 +37,8 @@ public class SolicitudController : ControllerBase
     [HttpGet("{Id}")]
     public IActionResult GetSolicitudesId(int Id)
     {
-        var solicitud = _db.Solicituds
+        var solicitud = _db.Solicituds.Include(o=>o.DetalleSolicituds)
+            .Include(o=>o.Usuario)
             .FirstOrDefault(u => u.IdSolicitud == Id);
 
         if (solicitud == null)

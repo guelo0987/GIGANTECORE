@@ -5880,7 +5880,6 @@
       "packagesPath": "/Users/miguelcruz/.nuget/packages/",
       "outputPath": "/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/obj/",
       "projectStyle": "PackageReference",
-      "UsingMicrosoftNETSdk": false,
       "configFilePaths": [
         "/Users/miguelcruz/.nuget/NuGet/NuGet.Config"
       ],
@@ -5906,7 +5905,8 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "all"
-      }
+      },
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
       "net8.0": {

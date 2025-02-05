@@ -26,7 +26,10 @@ public class DetalleSolicitudController : ControllerBase
     public IActionResult GetDetalleSolicitudes()
     {
         // Retorna todos los productos
-        return Ok(_db.DetalleSolicituds.ToList());
+        return Ok(_db.DetalleSolicituds.
+            Include(o=>o.IdSolicitudNavigation)
+            .Include(o=>o.Producto)
+            .ToList());
     }
 
  
@@ -34,7 +37,9 @@ public class DetalleSolicitudController : ControllerBase
     [HttpGet("{Id}")]
     public IActionResult GetDetalleSolicitudesId(int Id)
     {
-        var Detallesolicitud = _db.DetalleSolicituds
+        var Detallesolicitud = _db.DetalleSolicituds.
+            Include(o=>o.IdSolicitudNavigation)
+            .Include(o=>o.Producto)
             .FirstOrDefault(u => u.IdSolicitud == Id);
 
         if (Detallesolicitud == null)
