@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using GIGANTECORE.Context;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.EntityFrameworkCore;
 
 public class RolePermissionMiddleware
 {
@@ -16,17 +17,13 @@ public class RolePermissionMiddleware
         var path = context.Request.Path.Value;
         Console.WriteLine($"Ruta completa: {path}");
 
-        // Excluir rutas específicas (por ejemplo, login)
-        if (path != null && path.StartsWith("/api/Auth/login"))
+        // Excluir rutas específicas
+        if (path != null && (path.StartsWith("/api/Auth/login") || path.StartsWith("/api/Auth/register")))
         {
             await _next(context);
             return;
         }
-        
-        
-        
 
-        // Resolver el DbContext
         var db = context.RequestServices.GetRequiredService<MyDbContext>();
         var userRole = context.User.FindFirst(ClaimTypes.Role)?.Value;
         Console.WriteLine($"Rol del usuario: {userRole}");
@@ -38,7 +35,7 @@ public class RolePermissionMiddleware
             return;
         }
 
-        // Permitir acceso completo para Admin
+        // Permitir acceso completo para Administrador
         if (userRole == "Admin")
         {
             Console.WriteLine("Acceso permitido para el rol 'Admin'.");
@@ -46,7 +43,6 @@ public class RolePermissionMiddleware
             return;
         }
 
-        // Obtener el nombre del controlador
         var endpoint = context.GetEndpoint();
         var controllerName = endpoint?.Metadata.GetMetadata<ControllerActionDescriptor>()?.ControllerName;
         Console.WriteLine($"Controller Name: {controllerName}");
@@ -58,9 +54,10 @@ public class RolePermissionMiddleware
             return;
         }
 
-        // Verificar permisos en la tabla RolePermisos
-        var permission = db.RolePermisos
-            .FirstOrDefault(p => p.Role == userRole && p.TableName == controllerName);
+        // Verificar permisos usando Include para cargar la relación Role
+        var permission = await db.RolePermisos
+            .Include(p => p.Role)
+            .FirstOrDefaultAsync(p => p.Role.Name == userRole && p.TableName == controllerName);
 
         if (permission == null)
         {
@@ -69,52 +66,23 @@ public class RolePermissionMiddleware
             return;
         }
 
-        // Validar los permisos según el método HTTP
-        switch (context.Request.Method)
+        // Validar permisos según método HTTP
+        var isAllowed = context.Request.Method switch
         {
-            case "GET":
-                if (!permission.CanRead)
-                {
-                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    await context.Response.WriteAsync($"Acceso denegado: El rol '{userRole}' no tiene permiso para leer en la tabla '{controllerName}'.");
-                    return;
-                }
-                break;
+            "GET" => permission.CanRead,
+            "POST" => permission.CanCreate,
+            "PUT" => permission.CanUpdate,
+            "DELETE" => permission.CanDelete,
+            _ => false
+        };
 
-            case "POST":
-                if (!permission.CanCreate)
-                {
-                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    await context.Response.WriteAsync($"Acceso denegado: El rol '{userRole}' no tiene permiso para crear en la tabla '{controllerName}'.");
-                    return;
-                }
-                break;
-
-            case "PUT":
-                if (!permission.CanUpdate)
-                {
-                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    await context.Response.WriteAsync($"Acceso denegado: El rol '{userRole}' no tiene permiso para actualizar en la tabla '{controllerName}'.");
-                    return;
-                }
-                break;
-
-            case "DELETE":
-                if (!permission.CanDelete)
-                {
-                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    await context.Response.WriteAsync($"Acceso denegado: El rol '{userRole}' no tiene permiso para eliminar en la tabla '{controllerName}'.");
-                    return;
-                }
-                break;
-
-            default:
-                context.Response.StatusCode = StatusCodes.Status405MethodNotAllowed;
-                await context.Response.WriteAsync($"Método HTTP '{context.Request.Method}' no permitido.");
-                return;
+        if (!isAllowed)
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            await context.Response.WriteAsync($"Acceso denegado: El rol '{userRole}' no tiene permiso para {context.Request.Method} en la tabla '{controllerName}'.");
+            return;
         }
 
-        // Continuar con la solicitud
         await _next(context);
     }
 }

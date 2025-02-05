@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GIGANTECORE.Models;
 
@@ -13,7 +14,9 @@ public partial class Admin
 
     public string Password { get; set; } = null!;
 
-    public string? Rol { get; set; }
+    [ForeignKey("Role")]
+    public int? RolId { get; set; }
+    public virtual Roles? Role { get; set; }
 
     public DateTime? FechaIngreso { get; set; }
 

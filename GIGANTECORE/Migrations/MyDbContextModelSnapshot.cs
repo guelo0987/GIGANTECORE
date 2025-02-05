@@ -50,11 +50,8 @@ namespace GIGANTECORE.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Rol")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasDefaultValue("Administrador");
+                    b.Property<int?>("RolId")
+                        .HasColumnType("int");
 
                     b.Property<bool?>("SoloLectura")
                         .ValueGeneratedOnAdd()
@@ -67,6 +64,8 @@ namespace GIGANTECORE.Migrations
 
                     b.HasKey("Id")
                         .HasName("PK__Admin__3214EC07A4E8858C");
+
+                    b.HasIndex("RolId");
 
                     b.ToTable("Admin", (string)null);
                 });
@@ -264,11 +263,11 @@ namespace GIGANTECORE.Migrations
 
             modelBuilder.Entity("GIGANTECORE.Models.RolePermiso", b =>
                 {
-                    b.Property<int>("IdRol")
+                    b.Property<int>("IdPermiso")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdRol"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdPermiso"));
 
                     b.Property<bool>("CanCreate")
                         .HasColumnType("bit");
@@ -282,17 +281,37 @@ namespace GIGANTECORE.Migrations
                     b.Property<bool>("CanUpdate")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
 
                     b.Property<string>("TableName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("IdPermiso");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("RolePermisos");
+                });
+
+            modelBuilder.Entity("GIGANTECORE.Models.Roles", b =>
+                {
+                    b.Property<int>("IdRol")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdRol"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("IdRol");
 
-                    b.ToTable("RolePermisos");
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("GIGANTECORE.Models.Solicitud", b =>
@@ -382,11 +401,8 @@ namespace GIGANTECORE.Migrations
                         .HasColumnType("nvarchar(11)")
                         .HasColumnName("RNC");
 
-                    b.Property<string>("Rol")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("");
+                    b.Property<int>("RolId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Telefono")
                         .HasMaxLength(20)
@@ -400,9 +416,21 @@ namespace GIGANTECORE.Migrations
                     b.HasKey("Id")
                         .HasName("PK__UsuarioC__3214EC07D79F99F6");
 
+                    b.HasIndex("RolId");
+
                     b.HasIndex(new[] { "Rnc" }, "IX_UsuarioCliente_RNC");
 
                     b.ToTable("UsuarioCliente", (string)null);
+                });
+
+            modelBuilder.Entity("GIGANTECORE.Models.Admin", b =>
+                {
+                    b.HasOne("GIGANTECORE.Models.Roles", "Role")
+                        .WithMany("Admins")
+                        .HasForeignKey("RolId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("GIGANTECORE.Models.Carrito", b =>
@@ -480,6 +508,17 @@ namespace GIGANTECORE.Migrations
                     b.Navigation("SubCategoria");
                 });
 
+            modelBuilder.Entity("GIGANTECORE.Models.RolePermiso", b =>
+                {
+                    b.HasOne("GIGANTECORE.Models.Roles", "Role")
+                        .WithMany("RolePermisos")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("GIGANTECORE.Models.Solicitud", b =>
                 {
                     b.HasOne("GIGANTECORE.Models.UsuarioCliente", "Usuario")
@@ -509,7 +548,15 @@ namespace GIGANTECORE.Migrations
                         .HasForeignKey("Rnc")
                         .HasConstraintName("FK_UsuarioCliente_Compañia");
 
+                    b.HasOne("GIGANTECORE.Models.Roles", "Role")
+                        .WithMany("UsuarioClientes")
+                        .HasForeignKey("RolId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("RncNavigation");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("GIGANTECORE.Models.Categorium", b =>
@@ -534,6 +581,15 @@ namespace GIGANTECORE.Migrations
                     b.Navigation("Carritos");
 
                     b.Navigation("DetalleSolicituds");
+                });
+
+            modelBuilder.Entity("GIGANTECORE.Models.Roles", b =>
+                {
+                    b.Navigation("Admins");
+
+                    b.Navigation("RolePermisos");
+
+                    b.Navigation("UsuarioClientes");
                 });
 
             modelBuilder.Entity("GIGANTECORE.Models.Solicitud", b =>

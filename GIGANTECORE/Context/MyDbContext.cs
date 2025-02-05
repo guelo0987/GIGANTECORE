@@ -40,8 +40,16 @@ public partial class MyDbContext : DbContext
 
     public virtual DbSet<Banner> Banners { get; set; }
 
-protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public virtual DbSet<Roles> Roles { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Roles>(entity =>
+        {
+            entity.HasKey(e => e.IdRol);
+            entity.Property(e => e.Name).HasMaxLength(50).IsRequired();
+        });
+
         modelBuilder.Entity<Admin>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Admin__3214EC07A4E8858C");
@@ -54,11 +62,14 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
             entity.Property(e => e.Mail).HasMaxLength(100);
             entity.Property(e => e.Nombre).HasMaxLength(100);
             entity.Property(e => e.Password).HasMaxLength(100);
-            entity.Property(e => e.Rol)
-                .HasMaxLength(20)
-                .HasDefaultValue("Administrador");
+            entity.Property(e => e.RolId).IsRequired(false);
             entity.Property(e => e.SoloLectura).HasDefaultValue(false);
             entity.Property(e => e.Telefono).HasMaxLength(20);
+
+            entity.HasOne(d => d.Role)
+                .WithMany(p => p.Admins)
+                .HasForeignKey(d => d.RolId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<Carrito>(entity =>
@@ -227,13 +238,34 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
             entity.Property(e => e.Rnc)
                 .HasMaxLength(11)
                 .HasColumnName("RNC");
-            entity.Property(e => e.Rol).HasDefaultValue("");
+            entity.Property(e => e.RolId).IsRequired();
             entity.Property(e => e.Telefono).HasMaxLength(20);
             entity.Property(e => e.UserName).HasMaxLength(50);
 
             entity.HasOne(d => d.RncNavigation).WithMany(p => p.UsuarioClientes)
                 .HasForeignKey(d => d.Rnc)
                 .HasConstraintName("FK_UsuarioCliente_Compañia");
+
+            entity.HasOne(d => d.Role)
+                .WithMany(p => p.UsuarioClientes)
+                .HasForeignKey(d => d.RolId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<RolePermiso>(entity =>
+        {
+            entity.HasKey(e => e.IdPermiso);
+            entity.Property(e => e.RoleId).IsRequired();
+            entity.Property(e => e.TableName).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.CanCreate).IsRequired();
+            entity.Property(e => e.CanRead).IsRequired();
+            entity.Property(e => e.CanUpdate).IsRequired();
+            entity.Property(e => e.CanDelete).IsRequired();
+
+            entity.HasOne(d => d.Role)
+                .WithMany(p => p.RolePermisos)
+                .HasForeignKey(d => d.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GIGANTECORE.Models;
 
@@ -25,7 +26,9 @@ public partial class UsuarioCliente
 
     public DateTime? FechaIngreso { get; set; }
 
-    public string Rol { get; set; } = null!;
+    [ForeignKey("Role")]
+    public int RolId { get; set; }
+    public virtual Roles Role { get; set; } = null!;
 
     public virtual ICollection<Carrito> Carritos { get; set; } = new List<Carrito>();
 

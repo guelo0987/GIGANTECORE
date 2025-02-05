@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using PassHash;
+using Microsoft.EntityFrameworkCore;
 
 namespace GIGANTECORE.Controllers;
 
@@ -44,10 +45,20 @@ public IActionResult AddOrUpdate([FromBody] AdminDTO adminDto)
         return BadRequest("El correo es obligatorio.");
     }
 
+    // Verificar si el rol existe
+    var role = _db.Roles.FirstOrDefault(r => r.IdRol == adminDto.Rol);
+    if (role == null)
+    {
+        _logger.LogError($"El rol con ID {adminDto.Rol} no existe.");
+        return BadRequest("El rol especificado no existe.");
+    }
+
     // Verificamos si es una actualización (ID presente y válido)
     if (adminDto.Id > 0)
     {
-        var existingUser = _db.Admins.FirstOrDefault(u => u.Id == adminDto.Id);
+        var existingUser = _db.Admins
+            .Include(a => a.Role)
+            .FirstOrDefault(u => u.Id == adminDto.Id);
 
         if (existingUser == null)
         {
@@ -58,7 +69,7 @@ public IActionResult AddOrUpdate([FromBody] AdminDTO adminDto)
         // Actualizamos los valores
         existingUser.Nombre = adminDto.Nombre;
         existingUser.Mail = adminDto.Mail;
-        existingUser.Rol = adminDto.Rol;
+        existingUser.RolId = adminDto.Rol;
         existingUser.Telefono = adminDto.Telefono;
         existingUser.SoloLectura = adminDto.SoloLectura;
 
@@ -81,18 +92,12 @@ public IActionResult AddOrUpdate([FromBody] AdminDTO adminDto)
             return BadRequest("El correo ya está registrado.");
         }
 
-        if (adminDto.Rol != "Admin" && adminDto.Rol != "Empleado")
-        {
-            _logger.LogError("El rol debe ser Admin o Empleado.");
-            return BadRequest("El rol debe ser 'Admin' o 'Empleado'.");
-        }
-
         var newAdmin = new Admin
         {
             Nombre = adminDto.Nombre,
             Mail = adminDto.Mail,
-            Password = PassHasher.HashPassword(adminDto.Password), // Hasheamos la contraseña
-            Rol = adminDto.Rol,
+            Password = PassHasher.HashPassword(adminDto.Password),
+            RolId = adminDto.Rol,  // Usar el rol proporcionado
             FechaIngreso = DateTime.Now,
             Telefono = adminDto.Telefono,
             SoloLectura = adminDto.SoloLectura

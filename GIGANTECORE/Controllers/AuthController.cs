@@ -5,6 +5,7 @@ using GIGANTECORE.Context;
 using GIGANTECORE.DTO;
 using GIGANTECORE.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PassHash;
 
@@ -36,7 +37,7 @@ public class AuthController:ControllerBase
     public IActionResult AuthenticateAdmin([FromBody] LoginRequest loginRequest)
     {
         // Buscar el administrador por correo
-        var admin = _db.Admins.FirstOrDefault(a => a.Mail == loginRequest.Mail);
+        var admin = _db.Admins.Include(o=>o.Role).FirstOrDefault(a => a.Mail == loginRequest.Mail);
 
         if (admin == null)
         {
@@ -52,7 +53,7 @@ public class AuthController:ControllerBase
         }
 
         // Validar rol
-        if (admin.Rol != "Admin" && admin.Rol != "Empleado")
+        if (admin.Role.Name != "Admin" && admin.Role.Name != "Empleado")
         {
             _logger.LogError("Rol no válido.");
             return Unauthorized("El usuario no tiene un rol válido.");
@@ -64,7 +65,7 @@ public class AuthController:ControllerBase
             new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim("Id", admin.Id.ToString()),
-            new Claim(ClaimTypes.Role, admin.Rol) // Rol dinámico
+            new Claim(ClaimTypes.Role, admin.Role.Name) // Rol dinámico
         };
         
         _logger.LogInformation("Log in Exitoso");
@@ -75,9 +76,9 @@ public class AuthController:ControllerBase
             Nombre = admin.Nombre,
             Telefono = admin.Telefono,
             Mail = admin.Mail,
-            Rol = admin.Rol,
+            Rol = admin.RolId,
             SoloLectura = admin.SoloLectura
-        }, admin.Rol);
+        }, admin.Role.Name);
         
         
     }
