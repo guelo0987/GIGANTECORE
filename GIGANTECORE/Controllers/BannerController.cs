@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using GIGANTECORE.Context;
 using GIGANTECORE.Models;
-using GIGANTECORE.Services;
+using GIGANTECORE.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
-using PassHash;
 
 namespace GIGANTECORE.Controllers
 {

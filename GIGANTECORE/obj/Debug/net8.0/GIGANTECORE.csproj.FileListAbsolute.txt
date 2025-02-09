@@ -193,3 +193,4 @@
 /Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Imagenes/Banners/749a2bf2-8bd8-47eb-9604-391f6a610854.jpeg
 /Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Imagenes/Productos/a3599ca0-aa55-4945-9e56-f42d5ebd25a3.jpeg
 /Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Imagenes/Productos/ec12ff67-849f-49a9-af40-393feae3fe12.jpeg
+/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Imagenes/Banners/a59331d0-0e03-4dd8-b882-f5583a1eca45.jpeg

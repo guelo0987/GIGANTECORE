@@ -1,9 +1,7 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using GIGANTECORE.Models;
 using GIGANTECORE.Context;
+using GIGANTECORE.Models;
 
-namespace GIGANTECORE.Services;
+namespace GIGANTECORE.Utils;
 
 public class AdminMultiMedia
 {

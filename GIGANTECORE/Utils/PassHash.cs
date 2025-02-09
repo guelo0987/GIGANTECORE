@@ -1,4 +1,4 @@
-namespace PassHash
+namespace GIGANTECORE.Utils
 {
 
 

@@ -1,10 +1,6 @@
-using Microsoft.AspNetCore.Http;
-using System.IO;
-using System;
-using System.Collections.Generic;
 using GIGANTECORE.Context;
 
-namespace GIGANTECORE.Services
+namespace GIGANTECORE.Utils
 {
     public class AdminProductoMedia
     {

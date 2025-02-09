@@ -7,7 +7,6 @@ using GIGANTECORE.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using PassHash;
 
 namespace GIGANTECORE.Controllers;
 
@@ -78,7 +77,9 @@ public class AuthController:ControllerBase
             Mail = admin.Mail,
             Rol = admin.RolId,
             SoloLectura = admin.SoloLectura
-        }, admin.Role.Name);
+            
+        }, admin.Role.Name
+            );
         
         
     }

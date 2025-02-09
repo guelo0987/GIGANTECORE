@@ -4,10 +4,10 @@ using System.Text;
 using GIGANTECORE.Context;
 using GIGANTECORE.DTO;
 using GIGANTECORE.Models;
+using GIGANTECORE.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using PassHash;
 using Microsoft.EntityFrameworkCore;
 
 namespace GIGANTECORE.Controllers;
