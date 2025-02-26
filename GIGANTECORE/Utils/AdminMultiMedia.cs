@@ -1,11 +1,17 @@
 using GIGANTECORE.Context;
 using GIGANTECORE.Models;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace GIGANTECORE.Utils;
 
 public class AdminMultiMedia
 {
     private readonly MyDbContext _context;
+    private const string SharedImagesPath = "/Users/miguelcruz/ImageGigante/Banners"; // Ruta modificada
 
     public AdminMultiMedia(MyDbContext context)
     {
@@ -29,9 +35,17 @@ public class AdminMultiMedia
         }
 
         string fileName = Guid.NewGuid().ToString() + extension;
-        string path = Path.Combine(Directory.GetCurrentDirectory(), "Imagenes", "Banners");
-        FileStream stream = new FileStream(Path.Combine(path, fileName), FileMode.Create);
-        file.CopyTo(stream);
+        
+        // Ruta modificada
+        if (!Directory.Exists(SharedImagesPath))
+        {
+            Directory.CreateDirectory(SharedImagesPath);
+        }
+
+        using (var stream = new FileStream(Path.Combine(SharedImagesPath, fileName), FileMode.Create))
+        {
+            file.CopyTo(stream);
+        }
 
         var banner = new Banner
         {
@@ -53,7 +67,9 @@ public class AdminMultiMedia
             var banner = _context.Banners.Find(id);
             if (banner == null) return false;
 
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "Imagenes", "Banners", banner.ImageUrl);
+            // Ruta modificada
+            string path = Path.Combine(SharedImagesPath, banner.ImageUrl);
+            
             if (File.Exists(path))
             {
                 File.Delete(path);
@@ -70,6 +86,7 @@ public class AdminMultiMedia
         }
     }
 
+    // Los demás métodos permanecen igual (no usan rutas de archivo)
     public bool ReorderImages(List<(int id, int newOrder)> newOrders)
     {
         try

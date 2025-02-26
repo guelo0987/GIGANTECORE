@@ -1,4 +1,8 @@
 using GIGANTECORE.Context;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace GIGANTECORE.Utils
 {
@@ -27,7 +31,9 @@ namespace GIGANTECORE.Utils
             }
 
             string fileName = Guid.NewGuid().ToString() + extension;
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "Imagenes", "Productos");
+            
+            // Ruta modificada para Mac
+            string path = "/Users/miguelcruz/ImageGigante/Productos";
             
             if (!Directory.Exists(path))
             {
@@ -46,7 +52,9 @@ namespace GIGANTECORE.Utils
         {
             try
             {
-                string path = Path.Combine(Directory.GetCurrentDirectory(), "Imagenes", "Productos", fileName);
+                // Ruta modificada para Mac
+                string path = Path.Combine("/Users/miguelcruz/ImageGigante/Productos", fileName);
+                
                 if (File.Exists(path))
                 {
                     File.Delete(path);
