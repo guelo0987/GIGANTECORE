@@ -20,6 +20,8 @@ public partial class Producto
     public string? ImageUrl { get; set; }
 
     public int? CategoriaId { get; set; }
+    
+    public string? Descripcion { get; set; }
 
     public virtual ICollection<Carrito> Carritos { get; set; } = new List<Carrito>();
 

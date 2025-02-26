@@ -71,6 +71,7 @@ public class ProductoController : ControllerBase
         existingProducto.Nombre = producto.Nombre;
         existingProducto.Marca = producto.Marca;
         existingProducto.Stock = producto.Stock;
+        existingProducto.Descripcion = producto.Descripcion;
         existingProducto.SubCategoriaId = producto.SubCategoriaId;
         existingProducto.CategoriaId = producto.CategoriaId;
 
@@ -97,6 +98,7 @@ public class ProductoController : ControllerBase
             Nombre = producto.Nombre,
             Marca = producto.Marca,
             Stock = producto.Stock,
+            Descripcion = producto.Descripcion,
             SubCategoriaId = producto.SubCategoriaId,
             CategoriaId = producto.CategoriaId,
             ImageUrl = fileName

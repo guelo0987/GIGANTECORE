@@ -9,4 +9,6 @@ public class ProductoDTO
     public int SubCategoriaId { get; set; }
     public string? ImageUrl { get; set; }
     public int? CategoriaId { get; set; }
+    
+    public string Descripcion { get; set; }
 }
