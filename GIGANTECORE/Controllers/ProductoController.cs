@@ -74,6 +74,7 @@ public class ProductoController : ControllerBase
         existingProducto.Descripcion = producto.Descripcion;
         existingProducto.SubCategoriaId = producto.SubCategoriaId;
         existingProducto.CategoriaId = producto.CategoriaId;
+        existingProducto.EsDestacado = producto.EsDestacado;
 
         _db.SaveChanges();
         return Ok(new { Message = "Producto actualizado exitosamente.", Producto = existingProducto });
@@ -101,7 +102,8 @@ public class ProductoController : ControllerBase
             Descripcion = producto.Descripcion,
             SubCategoriaId = producto.SubCategoriaId,
             CategoriaId = producto.CategoriaId,
-            ImageUrl = fileName
+            ImageUrl = fileName,
+            EsDestacado = producto.EsDestacado
         };
 
         _db.Productos.Add(newProducto);

@@ -11,4 +11,6 @@ public class ProductoDTO
     public int? CategoriaId { get; set; }
     
     public string? Descripcion { get; set; }
+    
+    public bool? EsDestacado { get; set; }
 }
