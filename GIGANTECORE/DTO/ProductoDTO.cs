@@ -10,5 +10,5 @@ public class ProductoDTO
     public string? ImageUrl { get; set; }
     public int? CategoriaId { get; set; }
     
-    public string Descripcion { get; set; }
+    public string? Descripcion { get; set; }
 }
