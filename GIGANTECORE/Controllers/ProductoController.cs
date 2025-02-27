@@ -46,6 +46,10 @@ public class ProductoController : ControllerBase
         return Ok(producto);
     }
 
+    
+    
+    
+    
     [HttpPost]
     [Consumes("multipart/form-data")]
     public IActionResult AddOrUpdateProducto([FromForm] ProductoDTO producto, IFormFile? imageFile)
@@ -112,6 +116,15 @@ public class ProductoController : ControllerBase
         return Ok(new { Message = "Producto creado exitosamente.", Producto = newProducto });
     }
 }
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     [HttpDelete("{codigo}")]
     public IActionResult DeleteProducto(int codigo)

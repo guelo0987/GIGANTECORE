@@ -1,10 +1,10 @@
-using GIGANTECORE.DTO;
 using GIGANTECORE.Context;
+using GIGANTECORE.DTO;
 using GIGANTECORE.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace GIGANTECLIENTCORE.Controllers
+namespace GIGANTECORE.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -19,15 +19,14 @@ namespace GIGANTECLIENTCORE.Controllers
             _logger = logger;
         }
         
-        // GET: api/vacantes
+        // Nuevo método GET para obtener todas las vacantes
         [HttpGet]
-        public async Task<IActionResult> GetVacantes()
+        public async Task<IActionResult> GetAllVacantes()
         {
-            _logger.LogInformation("Obteniendo todas las vacantes...");
             var vacantes = await _db.Vacantes.ToListAsync();
-            var vacantesDto = vacantes.Select(v => MapToDto(v)).ToList();
-            return Ok(vacantesDto);
+            return Ok(vacantes);
         }
+
         
         // GET: api/vacantes/{id}
         [HttpGet("{id}")]

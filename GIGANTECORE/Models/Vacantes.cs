@@ -11,11 +11,11 @@ public class Vacantes
     public char sexo { get; set; }
     public string NivelAcademico { get; set; }
     public int? AnosExperiencia { get; set; }
-    public string FuncionLaboral { get; set; }
-    public string OtraFuncionLaboral { get; set; }
+    public string? FuncionLaboral { get; set; }
+    public string? OtraFuncionLaboral { get; set; }
     public decimal? UltimoSalario { get; set; }
-    public string NivelLaboral { get; set; }
-    public string OtroNivelLaboral { get; set; }
+    public string? NivelLaboral { get; set; }
+    public string? OtroNivelLaboral { get; set; }
     public string? CurriculumUrl { get; set; }
     public DateTime FechaAplicacion { get; set; }
     public string? estado { get; set; }
