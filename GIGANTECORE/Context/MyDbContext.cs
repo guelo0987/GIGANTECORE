@@ -41,6 +41,8 @@ public partial class MyDbContext : DbContext
     public virtual DbSet<Banner> Banners { get; set; }
 
     public virtual DbSet<Roles> Roles { get; set; }
+    
+    public virtual DbSet<Vacantes> Vacantes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
