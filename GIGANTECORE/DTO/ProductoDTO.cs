@@ -13,4 +13,6 @@ public class ProductoDTO
     public string? Descripcion { get; set; }
     
     public bool? EsDestacado { get; set; }
+    
+    public string? Medidas { get; set; }
 }
