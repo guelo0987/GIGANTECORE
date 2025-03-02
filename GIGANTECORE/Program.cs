@@ -108,10 +108,12 @@ builder.Services.AddCors(options =>
             .AllowCredentials());
 });
 
+
+
 var app = builder.Build();
 
 // ===================================================
-// CONFIGURACIÓN FINAL DE MIDDLEWARES
+// CONFIGURACIÓN FINAL DE ARCHIVOS ESTATICOS
 // ===================================================
 
 // A. Configuración de archivos estáticos (IMPORTANTE)

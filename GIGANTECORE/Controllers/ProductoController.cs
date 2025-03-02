@@ -52,72 +52,84 @@ public class ProductoController : ControllerBase
     
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public IActionResult AddOrUpdateProducto([FromForm] ProductoDTO producto, IFormFile? imageFile)
+    public async Task<IActionResult> AddOrUpdateProducto([FromForm] ProductoDTO producto, IFormFile? imageFile)
     {
-    if (producto == null || string.IsNullOrWhiteSpace(producto.Nombre))
-    {
-        return BadRequest(new { Message = "Los datos del producto son obligatorios." });
-    }
-
-    var adminMedia = new AdminProductoMedia(_db);
-
-    // Si el producto ya existe, actualizamos
-    var existingProducto = _db.Productos.FirstOrDefault(p => p.Codigo == producto.Codigo);
-
-    if (existingProducto != null)
-    {
-        // Actualizar imagen si se proporciona una nueva
-        if (imageFile != null)
+        if (producto == null || string.IsNullOrWhiteSpace(producto.Nombre))
         {
-            existingProducto.ImageUrl = adminMedia.Update(imageFile, existingProducto.ImageUrl);
+            return BadRequest(new { Message = "Los datos del producto son obligatorios." });
         }
 
-        existingProducto.Nombre = producto.Nombre;
-        existingProducto.Marca = producto.Marca;
-        existingProducto.Stock = producto.Stock;
-        existingProducto.Descripcion = producto.Descripcion;
-        existingProducto.SubCategoriaId = producto.SubCategoriaId;
-        existingProducto.CategoriaId = producto.CategoriaId;
-        existingProducto.EsDestacado = producto.EsDestacado;
-        existingProducto.Medidas = producto.Medidas;
+        var adminMedia = new AdminProductoMedia(_db);
+        var existingProducto = _db.Productos.FirstOrDefault(p => p.Codigo == producto.Codigo);
 
-        _db.SaveChanges();
-        return Ok(new { Message = "Producto actualizado exitosamente.", Producto = existingProducto });
-    }
-    else
-    {
-        // Crear nuevo producto
-        if (_db.Productos.Any(p => p.Nombre.ToLower() == producto.Nombre.ToLower()))
+        if (existingProducto != null)
         {
-            return Conflict(new { Message = $"Ya existe un producto con el nombre '{producto.Nombre}'." });
+            if (imageFile != null)
+            {
+                var uploadResult = await adminMedia.Update(imageFile, existingProducto.ImageUrl);
+                if (uploadResult is { } result && result.GetType().GetProperty("success")?.GetValue(result) is bool success)
+                {
+                    if (!success)
+                    {
+                        return BadRequest(new { Message = "Error al actualizar la imagen del producto." });
+                    }
+                    existingProducto.ImageUrl = result.GetType().GetProperty("fileName")?.GetValue(result)?.ToString();
+                }
+            }
+
+            existingProducto.Nombre = producto.Nombre;
+            existingProducto.Marca = producto.Marca;
+            existingProducto.Stock = producto.Stock;
+            existingProducto.Descripcion = producto.Descripcion;
+            existingProducto.SubCategoriaId = producto.SubCategoriaId;
+            existingProducto.CategoriaId = producto.CategoriaId;
+            existingProducto.EsDestacado = producto.EsDestacado;
+            existingProducto.Medidas = producto.Medidas;
+
+            await _db.SaveChangesAsync();
+            return Ok(new { Message = "Producto actualizado exitosamente.", Producto = existingProducto });
         }
-
-        string fileName = null;
-        if (imageFile != null)
+        else
         {
-            fileName = adminMedia.Upload(imageFile);
+            if (_db.Productos.Any(p => p.Nombre.ToLower() == producto.Nombre.ToLower()))
+            {
+                return Conflict(new { Message = $"Ya existe un producto con el nombre '{producto.Nombre}'." });
+            }
+
+            string fileName = null;
+            if (imageFile != null)
+            {
+                var uploadResult = await adminMedia.Upload(imageFile);
+                if (uploadResult is { } result && result.GetType().GetProperty("success")?.GetValue(result) is bool success)
+                {
+                    if (!success)
+                    {
+                        return BadRequest(new { Message = "Error al subir la imagen del producto." });
+                    }
+                    fileName = result.GetType().GetProperty("fileName")?.GetValue(result)?.ToString();
+                }
+            }
+
+            var newProducto = new Producto
+            {
+                Codigo = producto.Codigo,
+                Nombre = producto.Nombre,
+                Marca = producto.Marca,
+                Stock = producto.Stock,
+                Descripcion = producto.Descripcion,
+                SubCategoriaId = producto.SubCategoriaId,
+                CategoriaId = producto.CategoriaId,
+                ImageUrl = fileName,
+                EsDestacado = producto.EsDestacado,
+                Medidas = producto.Medidas
+            };
+
+            _db.Productos.Add(newProducto);
+            await _db.SaveChangesAsync();
+
+            return Ok(new { Message = "Producto creado exitosamente.", Producto = newProducto });
         }
-
-        var newProducto = new Producto
-        {
-            Codigo = producto.Codigo,
-            Nombre = producto.Nombre,
-            Marca = producto.Marca,
-            Stock = producto.Stock,
-            Descripcion = producto.Descripcion,
-            SubCategoriaId = producto.SubCategoriaId,
-            CategoriaId = producto.CategoriaId,
-            ImageUrl = fileName,
-            EsDestacado = producto.EsDestacado,
-            Medidas = producto.Medidas
-        };
-
-        _db.Productos.Add(newProducto);
-        _db.SaveChanges();
-
-        return Ok(new { Message = "Producto creado exitosamente.", Producto = newProducto });
     }
-}
     
     
     
@@ -129,7 +141,7 @@ public class ProductoController : ControllerBase
     
 
     [HttpDelete("{codigo}")]
-    public IActionResult DeleteProducto(int codigo)
+    public async Task<IActionResult> DeleteProducto(int codigo)
     {
         var producto = _db.Productos.FirstOrDefault(p => p.Codigo == codigo);
         if (producto == null)
@@ -138,10 +150,10 @@ public class ProductoController : ControllerBase
         }
 
         var adminMedia = new AdminProductoMedia(_db);
-        adminMedia.Delete(producto.ImageUrl);
+        await adminMedia.Delete(producto.ImageUrl);
 
         _db.Productos.Remove(producto);
-        _db.SaveChanges();
+        await _db.SaveChangesAsync();
 
         return Ok(new { Message = "Producto eliminado exitosamente." });
     }

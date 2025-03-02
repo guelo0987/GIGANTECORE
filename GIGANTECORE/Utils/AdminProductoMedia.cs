@@ -1,64 +1,69 @@
 using GIGANTECORE.Context;
 using Microsoft.AspNetCore.Http;
+using Google.Cloud.Storage.V1;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace GIGANTECORE.Utils
 {
     public class AdminProductoMedia
     {
         private readonly MyDbContext _context;
+        private readonly string _bucketName = "giganteimages";
+        private readonly string _folderPath = "ImageGigante/Productos/";
 
         public AdminProductoMedia(MyDbContext context)
         {
             _context = context;
         }
 
-        public string Upload(IFormFile file)
-        {
-            List<string> validExtensions = new List<string> { ".jpg", ".png", ".jpeg" };
-            string extension = Path.GetExtension(file.FileName);
-
-            if (!validExtensions.Contains(extension))
-            {
-                return $"Archivo no permitido: {string.Join(", ", validExtensions)}";
-            }
-
-            if (file.Length > (5 * 1024 * 1024))
-            {
-                return "El archivo no puede sobrepasar los 5MB.";
-            }
-
-            string fileName = Guid.NewGuid().ToString() + extension;
-            
-            // Ruta modificada para Mac
-            string path = "/Users/miguelcruz/ImageGigante/Productos";
-            
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-
-            using (var stream = new FileStream(Path.Combine(path, fileName), FileMode.Create))
-            {
-                file.CopyTo(stream);
-            }
-
-            return fileName;
-        }
-
-        public bool Delete(string fileName)
+        public async Task<object> Upload(IFormFile file)
         {
             try
             {
-                // Ruta modificada para Mac
-                string path = Path.Combine("/Users/miguelcruz/ImageGigante/Productos", fileName);
-                
-                if (File.Exists(path))
+                List<string> validExtensions = new List<string> { ".jpg", ".png", ".jpeg" };
+                string extension = Path.GetExtension(file.FileName);
+
+                if (!validExtensions.Contains(extension))
                 {
-                    File.Delete(path);
+                    return new { success = false, message = $"Archivo no permitido: {string.Join(", ", validExtensions)}" };
                 }
+
+                if (file.Length > (5 * 1024 * 1024))
+                {
+                    return new { success = false, message = "El archivo no puede sobrepasar los 5MB." };
+                }
+
+                string fileName = $"{_folderPath}{Guid.NewGuid().ToString()}{extension}";
+                var storageClient = await StorageClient.CreateAsync();
+
+                using (var stream = file.OpenReadStream())
+                {
+                    await storageClient.UploadObjectAsync(
+                        _bucketName,
+                        fileName,
+                        GetContentType(extension),
+                        stream);
+                }
+
+                return new { success = true, fileName = fileName };
+            }
+            catch (Exception ex)
+            {
+                return new { success = false, message = $"Error al subir archivo: {ex.Message}" };
+            }
+        }
+
+        public async Task<bool> Delete(string fileName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(fileName)) return true;
+
+                var storageClient = await StorageClient.CreateAsync();
+                await storageClient.DeleteObjectAsync(_bucketName, fileName);
                 return true;
             }
             catch
@@ -67,14 +72,24 @@ namespace GIGANTECORE.Utils
             }
         }
 
-        public string Update(IFormFile newFile, string oldFileName)
+        public async Task<object> Update(IFormFile newFile, string oldFileName)
         {
             if (!string.IsNullOrEmpty(oldFileName))
             {
-                Delete(oldFileName);
+                await Delete(oldFileName);
             }
 
-            return Upload(newFile);
+            return await Upload(newFile);
+        }
+
+        private string GetContentType(string extension)
+        {
+            return extension.ToLower() switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                _ => "application/octet-stream"
+            };
         }
     }
 }

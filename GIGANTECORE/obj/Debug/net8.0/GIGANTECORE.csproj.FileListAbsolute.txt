@@ -189,3 +189,12 @@
 /Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/GIGANTECORE.staticwebassets.endpoints.json
 /Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/obj/Debug/net8.0/staticwebassets.build.endpoints.json
 /Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/obj/Debug/net8.0/staticwebassets/msbuild.GIGANTECORE.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
+/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Google.Api.Gax.dll
+/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Google.Api.Gax.Rest.dll
+/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Google.Apis.dll
+/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Google.Apis.Auth.dll
+/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Google.Apis.Core.dll
+/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Google.Apis.Storage.v1.dll
+/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/Google.Cloud.Storage.V1.dll
+/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/System.Management.dll
+/Users/miguelcruz/Desktop/GIGANTECORE/GIGANTECORE/bin/Debug/net8.0/runtimes/win/lib/net7.0/System.Management.dll
