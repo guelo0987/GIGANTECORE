@@ -33,10 +33,12 @@ public class AuthController:ControllerBase
     
     // Autenticar Admin con DTO
     [HttpPost("login")]
-    public IActionResult AuthenticateAdmin([FromBody] LoginRequest loginRequest)
+    public async Task<IActionResult> AuthenticateAdmin([FromBody] LoginRequest loginRequest)
     {
         // Buscar el administrador por correo
-        var admin = _db.Admins.Include(o=>o.Role).FirstOrDefault(a => a.Mail == loginRequest.Mail);
+        var admin = await _db.Admins
+            .Include(o => o.Role)
+            .FirstOrDefaultAsync(a => a.Mail == loginRequest.Mail);
 
         if (admin == null)
         {
@@ -70,40 +72,36 @@ public class AuthController:ControllerBase
         _logger.LogInformation("Log in Exitoso");
 
         // Generar y devolver el token
-        return GenerateToken(claims, new ()
+        return await GenerateToken(claims, new AdminDTO
         {
             Nombre = admin.Nombre,
             Telefono = admin.Telefono,
             Mail = admin.Mail,
             Rol = admin.RolId,
             SoloLectura = admin.SoloLectura
-            
-        }, admin.Role.Name
-            );
-        
-        
+        }, admin.Role.Name);
     }
 
 
-        // Generar Token JWT
-        private IActionResult GenerateToken(Claim[] claims, AdminDTO adminDto, string role)
-        {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+    // Generar Token JWT
+    private async Task<IActionResult> GenerateToken(Claim[] claims, AdminDTO adminDto, string role)
+    {
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+        var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
-                _configuration["Jwt:Audience"],
-                claims,
-                expires: DateTime.UtcNow.AddMinutes(60),
-                signingCredentials: signIn
-            );
+        var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
+            _configuration["Jwt:Audience"],
+            claims,
+            expires: DateTime.UtcNow.AddMinutes(60),
+            signingCredentials: signIn
+        );
 
-            string tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
+        string tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
 
-            _logger.LogInformation("Login exitoso");
+        _logger.LogInformation("Login exitoso");
 
-            return Ok(new { Token = tokenValue, User = adminDto, Role = role });
-        }
+        return Ok(new { Token = tokenValue, User = adminDto, Role = role });
+    }
     
     
 

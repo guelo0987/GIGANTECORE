@@ -4,6 +4,7 @@ using GIGANTECORE.DTO;
 using GIGANTECORE.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GIGANTECORE.Controllers;
 
@@ -22,18 +23,17 @@ public class SubCategoriaController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetSubCategorias()
+    public async Task<IActionResult> GetSubCategorias()
     {
-        // Retorna todas las subcategorías
-        return Ok(_db.SubCategoria.ToList());
+        return Ok(await _db.SubCategoria.ToListAsync());
     }
     
     
     [HttpGet("{id}")]
-    public IActionResult GetSubCategoriaId(int id)
+    public async Task<IActionResult> GetSubCategoriaId(int id)
     {
-        var subCategorium = _db.SubCategoria
-            .FirstOrDefault(u => u.Id == id);
+        var subCategorium = await _db.SubCategoria
+            .FirstOrDefaultAsync(u => u.Id == id);
 
         if (subCategorium == null)
         {
@@ -45,7 +45,7 @@ public class SubCategoriaController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult AddOrUpdateSubCategoria([FromBody] SubCategoriumDTO subCategoria)
+    public async Task<IActionResult> AddOrUpdateSubCategoria([FromBody] SubCategoriumDTO subCategoria)
     {
         if (subCategoria == null)
         {
@@ -64,14 +64,14 @@ public class SubCategoriaController : ControllerBase
 
         if (subCategoria.Id > 0) // Actualizar subcategoría existente
         {
-            var existingSubCategoria = _db.SubCategoria.FirstOrDefault(sc => sc.Id == subCategoria.Id);
+            var existingSubCategoria = await _db.SubCategoria.FirstOrDefaultAsync(sc => sc.Id == subCategoria.Id);
 
             if (existingSubCategoria == null)
             {
                 return NotFound(new { Message = "La subcategoría no fue encontrada para su actualización." });
             }
 
-            if (_db.SubCategoria.Any(sc => sc.Id != subCategoria.Id && sc.Nombre.ToLower() == subCategoria.Nombre.ToLower()))
+            if (await _db.SubCategoria.AnyAsync(sc => sc.Id != subCategoria.Id && sc.Nombre.ToLower() == subCategoria.Nombre.ToLower()))
             {
                 return Conflict(new { Message = $"Ya existe otra subcategoría con el nombre '{subCategoria.Nombre}'." });
             }
@@ -80,12 +80,12 @@ public class SubCategoriaController : ControllerBase
             existingSubCategoria.Nombre = subCategoria.Nombre;
             existingSubCategoria.CategoriaId = subCategoria.CategoriaId;
 
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             return Ok(new { Message = "Subcategoría actualizada exitosamente.", SubCategoria = existingSubCategoria });
         }
         else // Crear nueva subcategoría
         {
-            if (_db.SubCategoria.Any(sc => sc.Nombre.ToLower() == subCategoria.Nombre.ToLower()))
+            if (await _db.SubCategoria.AnyAsync(sc => sc.Nombre.ToLower() == subCategoria.Nombre.ToLower()))
             {
                 return Conflict(new { Message = $"Ya existe una subcategoría con el nombre '{subCategoria.Nombre}'." });
             }
@@ -96,24 +96,24 @@ public class SubCategoriaController : ControllerBase
                 CategoriaId = subCategoria.CategoriaId
             };
 
-            _db.SubCategoria.Add(newSubCategoria);
-            _db.SaveChanges();
+            await _db.SubCategoria.AddAsync(newSubCategoria);
+            await _db.SaveChangesAsync();
 
             return Ok(new { Message = "Subcategoría creada exitosamente.", SubCategoria = newSubCategoria });
         }
     }
 
     [HttpDelete("{id}")]
-    public IActionResult DeleteSubCategoria(int id)
+    public async Task<IActionResult> DeleteSubCategoria(int id)
     {
-        var subCategoria = _db.SubCategoria.FirstOrDefault(sc => sc.Id == id);
+        var subCategoria = await _db.SubCategoria.FirstOrDefaultAsync(sc => sc.Id == id);
         if (subCategoria == null)
         {
             return NotFound(new { Message = "La subcategoría no fue encontrada." });
         }
 
         _db.SubCategoria.Remove(subCategoria);
-        _db.SaveChanges();
+        await _db.SaveChangesAsync();
 
         return Ok(new { Message = "Subcategoría eliminada exitosamente." });
     }

@@ -23,23 +23,21 @@ public class SolicitudController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetSolicitudes()
+    public async Task<IActionResult> GetSolicitudes()
     {
-        // Retorna todos los productos
-        return Ok(_db.Solicituds
-            .Include(o=>o.DetalleSolicituds)
-            .Include(o=>o.Usuario)
-            .ToList());
+        return Ok(await _db.Solicituds
+            .Include(o => o.DetalleSolicituds)
+            .Include(o => o.Usuario)
+            .ToListAsync());
     }
 
-
-
     [HttpGet("{Id}")]
-    public IActionResult GetSolicitudesId(int Id)
+    public async Task<IActionResult> GetSolicitudesId(int Id)
     {
-        var solicitud = _db.Solicituds.Include(o=>o.DetalleSolicituds)
-            .Include(o=>o.Usuario)
-            .FirstOrDefault(u => u.IdSolicitud == Id);
+        var solicitud = await _db.Solicituds
+            .Include(o => o.DetalleSolicituds)
+            .Include(o => o.Usuario)
+            .FirstOrDefaultAsync(u => u.IdSolicitud == Id);
 
         if (solicitud == null)
         {
@@ -49,5 +47,4 @@ public class SolicitudController : ControllerBase
 
         return Ok(solicitud);
     }
-
 }

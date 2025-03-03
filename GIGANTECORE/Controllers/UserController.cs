@@ -31,7 +31,7 @@ public class UserController : ControllerBase
     // Crear o Editar un  usuario
     
   [HttpPost]  
-public IActionResult AddOrUpdate([FromBody] AdminDTO adminDto)
+public async Task<IActionResult> AddOrUpdate([FromBody] AdminDTO adminDto)
 {
     if (adminDto == null)
     {
@@ -46,7 +46,7 @@ public IActionResult AddOrUpdate([FromBody] AdminDTO adminDto)
     }
 
     // Verificar si el rol existe
-    var role = _db.Roles.FirstOrDefault(r => r.IdRol == adminDto.Rol);
+    var role = await _db.Roles.FirstOrDefaultAsync(r => r.IdRol == adminDto.Rol);
     if (role == null)
     {
         _logger.LogError($"El rol con ID {adminDto.Rol} no existe.");
@@ -56,9 +56,9 @@ public IActionResult AddOrUpdate([FromBody] AdminDTO adminDto)
     // Verificamos si es una actualización (ID presente y válido)
     if (adminDto.Id > 0)
     {
-        var existingUser = _db.Admins
+        var existingUser = await _db.Admins
             .Include(a => a.Role)
-            .FirstOrDefault(u => u.Id == adminDto.Id);
+            .FirstOrDefaultAsync(u => u.Id == adminDto.Id);
 
         if (existingUser == null)
         {
@@ -79,14 +79,14 @@ public IActionResult AddOrUpdate([FromBody] AdminDTO adminDto)
             existingUser.Password = PassHasher.HashPassword(adminDto.Password);
         }
 
-        _db.SaveChanges();
+        await _db.SaveChangesAsync();
         _logger.LogInformation($"Usuario con ID {adminDto.Id} actualizado exitosamente.");
         return Ok(new { Message = "Usuario actualizado exitosamente.", UserId = existingUser.Id });
     }
     else
     {
         // Validaciones para un nuevo registro
-        if (_db.Admins.Any(a => a.Mail == adminDto.Mail))
+        if (await _db.Admins.AnyAsync(a => a.Mail == adminDto.Mail))
         {
             _logger.LogError("El correo ya está registrado.");
             return BadRequest("El correo ya está registrado.");
@@ -103,8 +103,8 @@ public IActionResult AddOrUpdate([FromBody] AdminDTO adminDto)
             SoloLectura = adminDto.SoloLectura
         };
 
-        _db.Admins.Add(newAdmin);
-        _db.SaveChanges();
+        await _db.Admins.AddAsync(newAdmin);
+        await _db.SaveChangesAsync();
         _logger.LogInformation("Usuario creado exitosamente.");
 
         return Ok(new { Message = "Usuario registrado exitosamente.", UserId = newAdmin.Id });
@@ -114,19 +114,18 @@ public IActionResult AddOrUpdate([FromBody] AdminDTO adminDto)
 
     // Obtener todos los usuarios
     [HttpGet]
-    public IActionResult GetAllUsers()
+    public async Task<IActionResult> GetAllUsers()
     {
-        var users = _db.Admins.ToList();
+        var users = await _db.Admins.ToListAsync();
 
         return Ok(users);
     }
 
     // Obtener un usuario por ID
     [HttpGet("{id}")]
-    public IActionResult GetUserById(int id)
+    public async Task<IActionResult> GetUserById(int id)
     {
-        var user = _db.Admins
-            .FirstOrDefault(u => u.Id == id);
+        var user = await _db.Admins.FirstOrDefaultAsync(u => u.Id == id);
 
         if (user == null)
         {
@@ -142,9 +141,9 @@ public IActionResult AddOrUpdate([FromBody] AdminDTO adminDto)
 
     // Eliminar un usuario
     [HttpDelete("{id}")]
-    public IActionResult DeleteUser(int id)
+    public async Task<IActionResult> DeleteUser(int id)
     {
-        var user = _db.Admins.FirstOrDefault(u => u.Id == id);
+        var user = await _db.Admins.FirstOrDefaultAsync(u => u.Id == id);
 
         if (user == null)
         {
@@ -153,7 +152,7 @@ public IActionResult AddOrUpdate([FromBody] AdminDTO adminDto)
         }
 
         _db.Admins.Remove(user);
-        _db.SaveChanges();
+        await _db.SaveChangesAsync();
         _logger.LogInformation($"Usuario con ID {id} eliminado exitosamente.");
 
         return Ok("Usuario eliminado exitosamente.");

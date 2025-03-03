@@ -4,6 +4,7 @@ using GIGANTECORE.DTO;
 using GIGANTECORE.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GIGANTECORE.Controllers;
 
@@ -32,17 +33,16 @@ public class CategoriaController:ControllerBase
 
     
     [HttpGet]
-    public IActionResult GetCategorias()
+    public async Task<IActionResult> GetCategorias()
     {
-        // No necesitas verificar permisos aquí, ya que el middleware lo maneja
-        return Ok(_db.Categoria.ToList());
+        return Ok(await _db.Categoria.ToListAsync());
     }
     
     [HttpGet("{id}")]
-    public IActionResult GetCategoriaId(int id)
+    public async Task<IActionResult> GetCategoriaId(int id)
     {
-        var categorium = _db.Categoria
-            .FirstOrDefault(u => u.Id == id);
+        var categorium = await _db.Categoria
+            .FirstOrDefaultAsync(u => u.Id == id);
 
         if (categorium == null)
         {
@@ -55,69 +55,69 @@ public class CategoriaController:ControllerBase
 
     
     [HttpPost]
-public IActionResult AddOrUpdateCategoria([FromBody] CategoriumDTO categoria)
-{
-    // Validar que el objeto no sea nulo
-    if (categoria == null)
+    public async Task<IActionResult> AddOrUpdateCategoria([FromBody] CategoriumDTO categoria)
     {
-        return BadRequest(new { Message = "El cuerpo de la solicitud no puede estar vacío." });
-    }
-
-    // Validar que el nombre no esté vacío
-    if (string.IsNullOrWhiteSpace(categoria.Nombre))
-    {
-        return BadRequest(new { Message = "El nombre de la categoría es obligatorio." });
-    }
-
-    if (categoria.Id > 0) // Actualizar categoría existente
-    {
-        // Buscar la categoría por ID
-        var existingCategoria = _db.Categoria.FirstOrDefault(c => c.Id == categoria.Id);
-
-        if (existingCategoria == null)
+        // Validar que el objeto no sea nulo
+        if (categoria == null)
         {
-            return NotFound(new { Message = "La categoría no fue encontrada para su actualización." });
+            return BadRequest(new { Message = "El cuerpo de la solicitud no puede estar vacío." });
         }
 
-        // Verificar si el nuevo nombre ya existe en otra categoría (case insensitive)
-        if (_db.Categoria.Any(c => c.Id != categoria.Id && c.Nombre.ToLower() == categoria.Nombre.ToLower()))
+        // Validar que el nombre no esté vacío
+        if (string.IsNullOrWhiteSpace(categoria.Nombre))
         {
-            return Conflict(new { Message = $"Ya existe otra categoría con el nombre '{categoria.Nombre}'." });
+            return BadRequest(new { Message = "El nombre de la categoría es obligatorio." });
         }
 
-        // Actualizar los datos de la categoría
-        existingCategoria.Nombre = categoria.Nombre;
-
-        _db.SaveChanges();
-        return Ok(new { Message = "Categoría actualizada exitosamente.", Categoria = existingCategoria });
-    }
-    else // Crear nueva categoría
-    {
-        // Verificar si ya existe una categoría con el mismo nombre
-        if (_db.Categoria.Any(c => c.Nombre.ToLower() == categoria.Nombre.ToLower()))
+        if (categoria.Id > 0) // Actualizar categoría existente
         {
-            return Conflict(new { Message = $"Ya existe una categoría con el nombre '{categoria.Nombre}'." });
+            // Buscar la categoría por ID
+            var existingCategoria = await _db.Categoria.FirstOrDefaultAsync(c => c.Id == categoria.Id);
+
+            if (existingCategoria == null)
+            {
+                return NotFound(new { Message = "La categoría no fue encontrada para su actualización." });
+            }
+
+            // Verificar si el nuevo nombre ya existe en otra categoría (case insensitive)
+            if (await _db.Categoria.AnyAsync(c => c.Id != categoria.Id && c.Nombre.ToLower() == categoria.Nombre.ToLower()))
+            {
+                return Conflict(new { Message = $"Ya existe otra categoría con el nombre '{categoria.Nombre}'." });
+            }
+
+            // Actualizar los datos de la categoría
+            existingCategoria.Nombre = categoria.Nombre;
+
+            await _db.SaveChangesAsync();
+            return Ok(new { Message = "Categoría actualizada exitosamente.", Categoria = existingCategoria });
         }
-
-        // Crear nueva categoría
-        var newCategoria = new Categorium
+        else // Crear nueva categoría
         {
-            Nombre = categoria.Nombre
-        };
+            // Verificar si ya existe una categoría con el mismo nombre
+            if (await _db.Categoria.AnyAsync(c => c.Nombre.ToLower() == categoria.Nombre.ToLower()))
+            {
+                return Conflict(new { Message = $"Ya existe una categoría con el nombre '{categoria.Nombre}'." });
+            }
 
-        _db.Categoria.Add(newCategoria);
-        _db.SaveChanges();
+            // Crear nueva categoría
+            var newCategoria = new Categorium
+            {
+                Nombre = categoria.Nombre
+            };
 
-        return Ok(new { Message = "Categoría creada exitosamente.", Categoria = newCategoria });
+            _db.Categoria.Add(newCategoria);
+            await _db.SaveChangesAsync();
+
+            return Ok(new { Message = "Categoría creada exitosamente.", Categoria = newCategoria });
+        }
     }
-}
 
 
     [HttpDelete("{id}")]
-    public IActionResult DeleteCategoria(int id)
+    public async Task<IActionResult> DeleteCategoria(int id)
     {
         // Buscar la categoría existente
-        var categoria = _db.Categoria.FirstOrDefault(c => c.Id == id);
+        var categoria = await _db.Categoria.FirstOrDefaultAsync(c => c.Id == id);
         if (categoria == null)
         {
             return NotFound(new { Message = "La categoría no fue encontrada." });
@@ -125,7 +125,7 @@ public IActionResult AddOrUpdateCategoria([FromBody] CategoriumDTO categoria)
 
         // Eliminar la categoría
         _db.Categoria.Remove(categoria);
-        _db.SaveChanges();
+        await _db.SaveChangesAsync();
 
         return Ok(new { Message = "Categoría eliminada exitosamente." });
     }

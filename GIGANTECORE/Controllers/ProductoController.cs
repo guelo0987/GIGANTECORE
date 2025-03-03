@@ -5,6 +5,7 @@ using GIGANTECORE.Models;
 using GIGANTECORE.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GIGANTECORE.Controllers;
 
@@ -23,19 +24,18 @@ public class ProductoController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetProductos()
+    public async Task<IActionResult> GetProductos()
     {
-        // Retorna todos los productos
-        return Ok(_db.Productos.ToList());
+        return Ok(await _db.Productos.ToListAsync());
     }
     
     
     
     [HttpGet("{codigo}")]
-    public IActionResult GetProductoId(int codigo)
+    public async Task<IActionResult> GetProductoId(int codigo)
     {
-        var producto = _db.Productos
-            .FirstOrDefault(u => u.Codigo == codigo);
+        var producto = await _db.Productos
+            .FirstOrDefaultAsync(u => u.Codigo == codigo);
 
         if (producto == null)
         {
@@ -60,7 +60,7 @@ public class ProductoController : ControllerBase
         }
 
         var adminMedia = new AdminProductoMedia(_db);
-        var existingProducto = _db.Productos.FirstOrDefault(p => p.Codigo == producto.Codigo);
+        var existingProducto = await _db.Productos.FirstOrDefaultAsync(p => p.Codigo == producto.Codigo);
 
         if (existingProducto != null)
         {
@@ -91,7 +91,7 @@ public class ProductoController : ControllerBase
         }
         else
         {
-            if (_db.Productos.Any(p => p.Nombre.ToLower() == producto.Nombre.ToLower()))
+            if (await _db.Productos.AnyAsync(p => p.Nombre.ToLower() == producto.Nombre.ToLower()))
             {
                 return Conflict(new { Message = $"Ya existe un producto con el nombre '{producto.Nombre}'." });
             }
@@ -124,7 +124,7 @@ public class ProductoController : ControllerBase
                 Medidas = producto.Medidas
             };
 
-            _db.Productos.Add(newProducto);
+            await _db.Productos.AddAsync(newProducto);
             await _db.SaveChangesAsync();
 
             return Ok(new { Message = "Producto creado exitosamente.", Producto = newProducto });
@@ -143,7 +143,7 @@ public class ProductoController : ControllerBase
     [HttpDelete("{codigo}")]
     public async Task<IActionResult> DeleteProducto(int codigo)
     {
-        var producto = _db.Productos.FirstOrDefault(p => p.Codigo == codigo);
+        var producto = await _db.Productos.FirstOrDefaultAsync(p => p.Codigo == codigo);
         if (producto == null)
         {
             return NotFound(new { Message = "El producto no fue encontrado." });
